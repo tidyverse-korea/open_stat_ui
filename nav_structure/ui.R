@@ -85,10 +85,26 @@ link_groups <- list(
     )
 )
 
+# 데이터 분석 페이지 -------------------------------------------------
+
+analysis_page <- function() {
+    div(
+        Stack(
+            horizontal = TRUE,
+            tokens = list(childrenGap = 10)
+        ),
+        plotOutput("ggplotBarId")
+    )
+}    
+
+
 # 초중고 데이터셋 메뉴 -----------------------------------------------
 
-ui <- Nav(
-    groups = link_groups,
-    selectedKey = "key1"
-    # styles = navigation_styles
+ui <- fluentPage(
+    Nav(
+        groups = link_groups,
+        selectedKey = "key1"
+        # styles = navigation_styles
+    ),
+    div(class = "main", plotOutput("ggplotPieId"))
 )
