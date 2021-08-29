@@ -97,14 +97,51 @@ analysis_page <- function() {
     )
 }    
 
+# Layout 페이지 -------------------------------------------------
+
+layout <- function(mainUI){
+    div(class = "grid-container",
+        div(class = "header", header)
+    )
+}
+
+footer <- Stack(
+    horizontal = TRUE,
+    horizontalAlign = 'space-between',
+    tokens = list(childrenGap = 20),
+    Text(variant = "medium", "Built with R by Appsilon", block=TRUE),
+    Text(variant = "medium", nowrap = FALSE, "If you'd like to learn more, reach out to us at hello@appsilon.com"),
+    Text(variant = "medium", nowrap = FALSE, "All rights reserved.")
+)
+
+header <- tagList(
+    img(src = "R_logo.png", width="3%", class = "logo"),
+    div(Text(variant = "xLarge", "Open Stat. Package"), class = "title"),
+    CommandBar(
+        items = list(
+            CommandBarItem("New", icon = "Add", subitems = list(
+                CommandBarItem("Data Upload", "upload", key = "dataUpload")
+            )),
+            CommandBarItem("Data / Table", icon = "Table"),
+            CommandBarItem("Descriptive Statistics", icon = "Code"),
+            CommandBarItem("Visualization", icon = "Calendar")
+        ),
+        farItems = list(
+            CommandBarItem("Grid view", "Tiles", iconOnly = TRUE),
+            CommandBarItem("Info", "Info", iconOnly = TRUE)
+        ),
+        style = list(width = "100%")))
+
 
 # 초중고 데이터셋 메뉴 -----------------------------------------------
 
 ui <- fluentPage(
+    layout(),
     Nav(
         groups = link_groups,
         selectedKey = "key1"
         # styles = navigation_styles
     ),
-    div(class = "main", plotOutput("ggplotPieId"))
+    div(class = "main", plotOutput("ggplotPieId")),
+    div(class = "footer", footer)
 )
