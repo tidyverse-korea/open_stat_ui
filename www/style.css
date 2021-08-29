@@ -53,4 +53,15 @@ body {
   background-clip: padding-box;
 }
 
-background[]배경,원경,바탕,눈에 띄지 않는 곳,이면복사
+
+.title {
+  padding: 0px 14px 0px 14px;
+  color: #737373;
+  margin: 6px 0px 6px 10px;
+  border-left: 1px solid darkgray;
+  width: 220px;
+}
+
+.logo {
+  height: 44px;
+}
