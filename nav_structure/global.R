@@ -7,14 +7,16 @@ library(sass)
 library(shiny)
 library(shiny.fluent)
 library(shiny.router)
-library(statdata)
+# library(statdata)
 library(waffle)
 library(gt)
 library(ggtextures)
+library(tidyverse)
 
 # 1. Dataset ----
 
-gender <- statdata::gender
+gender <- read_csv("../../statdata/inst/extdata/025원시_성별.csv") %>% 
+    set_names("성별")
 
 gender_gt <- gender %>% 
     gt::gt()
