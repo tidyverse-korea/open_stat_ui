@@ -1,122 +1,43 @@
-library(dplyr)
-library(ggplot2)
-library(glue)
-library(leaflet)
-library(plotly)
-library(sass)
 library(shiny)
+library(tidyverse)
 library(shiny.fluent)
-library(shiny.router)
 
-makePage <- function (title, subtitle, contents) {
-    tagList(div(
-        class = "page-title",
-        span(title, class = "ms-fontSize-32 ms-fontWeight-semibold", style =
-                 "color: #323130"),
-        span(subtitle, class = "ms-fontSize-14 ms-fontWeight-regular", style =
-                 "color: #605E5C; margin: 14px;")
-    ),
-    contents)
-}
 
-analysis_page <- makePage(
-    "Sales representatives",
-    "Best performing reps",
-    div(
+details_list_columns <- tibble(
+    fieldName = c("rep_name", "date", "deal_amount", "client_name", "city", "is_closed"),
+    name = c("Sales rep", "Close date", "Amount", "Client", "City", "Is closed?"),
+    key = fieldName)
+
+filters <- tagList(
+    DatePicker.shinyInput("fromDate", value = as.Date('2020/01/01'), label = "From date"),
+    DatePicker.shinyInput("toDate", value = as.Date('2020/12/31'), label = "To date")
+)
+
+ui <- fluentPage(
+    filters,
+    uiOutput("analysis")
+)
+
+server <- function(input, output, session) {
+    
+    filtered_deals <- reactive({
+        filtered_deals <- fluentSalesDeals %>% filter(is_closed > 0)
+    })
+    
+    output$analysis <- renderUI({
+        
+        items_list <- if(nrow(filtered_deals()) > 0){
+            DetailsList(items = filtered_deals(), columns = details_list_columns)
+        } else {
+            p("No matching transactions.")
+        }
+        
         Stack(
-            horizontal = TRUE,
-            tokens = list(childrenGap = 10),
-            makeCard("Filters", filters, size = 4, style = "max-height: 320px"),
-            makeCard("Deals count", plotlyOutput("plot"), size = 8, style = "max-height: 320px")
-        ),
-        uiOutput("analysis")
-    )
-)
-
-
-
-header <- "header"
-navigation <- "navigation"
-footer <- "footer"
-
-layout <- function(mainUI){
-    div(class = "grid-container",
-        div(class = "header", header),
-        div(class = "sidenav", navigation),
-        div(class = "main", mainUI),
-        div(class = "footer", footer)
-    )
-}
-
-
-ui <- fluentPage(
-    layout(analysis_page),
-    tags$head(
-        tags$link(href = "style.css", rel = "stylesheet", type = "text/css")
-    ))
-
-header <- tagList(
-    img(src = "appsilon-logo.png", class = "logo"),
-    div(Text(variant = "xLarge", "Sales Reps Analysis"), class = "title"),
-    CommandBar(
-        items = list(
-            CommandBarItem("New", "Add", subitems = list(
-                CommandBarItem("Email message", "Mail", key = "emailMessage", href = "mailto:me@example.com"),
-                CommandBarItem("Calendar event", "Calendar", key = "calendarEvent")
-            )),
-            CommandBarItem("Upload sales plan", "Upload"),
-            CommandBarItem("Share analysis", "Share"),
-            CommandBarItem("Download report", "Download")
-        ),
-        farItems = list(
-            CommandBarItem("Grid view", "Tiles", iconOnly = TRUE),
-            CommandBarItem("Info", "Info", iconOnly = TRUE)
-        ),
-        style = list(width = "100%")))
-
-navigation <- Nav(
-    groups = list(
-        list(links = list(
-            list(name = 'Home', url = '#!/', key = 'home', icon = 'Home'),
-            list(name = 'Analysis', url = '#!/other', key = 'analysis', icon = 'AnalyticsReport'),
-            list(name = 'shiny.fluent', url = 'http://github.com/Appsilon/shiny.fluent', key = 'repo', icon = 'GitGraph'),
-            list(name = 'shiny.react', url = 'http://github.com/Appsilon/shiny.react', key = 'shinyreact', icon = 'GitGraph'),
-            list(name = 'Appsilon', url = 'http://appsilon.com', key = 'appsilon', icon = 'WebAppBuilderFragment')
-        ))
-    ),
-    initialSelectedKey = 'home',
-    styles = list(
-        root = list(
-            height = '100%',
-            boxSizing = 'border-box',
-            overflowY = 'auto'
+            tokens = list(childrenGap = 5),
+            Text(variant = "large", "Sales deals details", block = TRUE),
+            div(style="max-height: 500px; overflow: auto", items_list)
         )
-    )
-)
-
-footer <- Stack(
-    horizontal = TRUE,
-    horizontalAlign = 'space-between',
-    tokens = list(childrenGap = 20),
-    Text(variant = "medium", "Built with ❤ by Appsilon", block=TRUE),
-    Text(variant = "medium", nowrap = FALSE, "If you'd like to learn more, reach out to us at hello@appsilon.com"),
-    Text(variant = "medium", nowrap = FALSE, "All rights reserved.")
-)
-
-
-layout <- function(mainUI){
-    div(class = "grid-container",
-        div(class = "header", header),
-        div(class = "sidenav", navigation),
-        div(class = "main", mainUI),
-        div(class = "footer", footer)
-    )
+    })
 }
 
-# ---
-ui <- fluentPage(
-    layout(analysis_page),
-    tags$head(
-        tags$link(href = "style.css", rel = "stylesheet", type = "text/css")
-    ))
-
+shinyApp(ui, server)
