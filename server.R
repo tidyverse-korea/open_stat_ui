@@ -1,0 +1,26 @@
+
+server <- function(input, output, session) {
+    
+    filtered_deals <- reactive({
+        filtered_deals <- fluentSalesDeals %>% 
+            dplyr::filter(date >= input$fromDate,
+                          date <= input$toDate,
+                          is_closed > 0)
+    })
+    
+    output$analysis <- renderUI({
+        
+        items_list <- if(nrow(filtered_deals()) > 0){
+            DetailsList(items = filtered_deals(), columns = details_list_columns)
+        } else {
+            p("No matching transactions.")
+        }
+        
+        Stack(
+            tokens = list(childrenGap = 5),
+            Text(variant = "large", "Sales deals details", block = TRUE),
+            div(style="max-height: 500px; overflow: auto", items_list)
+        )
+    })
+}
+
