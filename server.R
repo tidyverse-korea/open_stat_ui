@@ -1,6 +1,8 @@
 
 server <- function(input, output, session) {
     
+    router$server(input, output, session)
+    
     # 제어 결과 필터링 리액티브 데이터프레임 ----------------------------
     filtered_deals <- reactive({
         req(input$fromDate)
@@ -58,4 +60,8 @@ server <- function(input, output, session) {
             addProviderTiles(providers$Stamen.TonerLite, options = providerTileOptions(noWrap = TRUE)) %>%
             addMarkers(data = points)
     })
+    
+    
 }
+
+
