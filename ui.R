@@ -1,12 +1,19 @@
-library(dplyr)
-library(ggplot2)
-library(glue)
-library(leaflet)
-library(plotly)
-library(sass)
-library(shiny)
-library(shiny.fluent)
-library(shiny.router)
+
+# 카드 제작 함수 ----------------------------------
+
+makeCard <- function(title, content, size = 12, style = "") {
+    div(
+        class = glue::glue("card ms-depth-8 ms-sm{size} ms-xl{size}"),
+        style = style,
+        Stack(
+            tokens = list(childrenGap = 5),
+            Text(variant = "large", title, block = TRUE),
+            content
+        )
+    )
+}
+
+# 페이지 제작 함수 ----------------------------------
 
 makePage <- function (title, subtitle, contents) {
     tagList(div(
@@ -19,6 +26,44 @@ makePage <- function (title, subtitle, contents) {
     contents)
 }
 
+# 제어를 위한 필터 ---------------------------------
+
+filters <- Stack(
+    
+    tokens = list(childrenGap = 10),
+    
+    Stack(
+        horizontal = TRUE,
+        tokens = list(childrenGap = 10),
+        DatePicker.shinyInput("fromDate", value = as.Date('2020/01/01'), label = "From date"),
+        DatePicker.shinyInput("toDate", value = as.Date('2020/12/31'), label = "To date")
+    ),
+    
+    Label("Filter by sales reps", className = "my_class"),
+    NormalPeoplePicker.shinyInput(
+        "selectedPeople",
+        class = "my_class",
+        options = fluentPeople,
+        pickerSuggestionsProps = list(
+            suggestionsHeaderText = 'Matching people',
+            mostRecentlyUsedHeaderText = 'Sales reps',
+            noResultsFoundText = 'No results found',
+            showRemoveButtons = TRUE
+        )
+    ),
+    
+    Slider.shinyInput("slider",
+                      value = 0, min = 0, max = 1000000, step = 100000,
+                      label = "Minimum amount",
+                      valueFormat = JS("function(x) { return '$' + x}"),
+                      snapToStep = TRUE
+    ),
+    
+    Toggle.shinyInput("closedOnly", value = TRUE, label = "Include closed deals only?")
+)
+
+# analysis 페이지 ----------------------------------------------------------
+
 analysis_page <- makePage(
     "Sales representatives",
     "Best performing reps",
@@ -28,35 +73,16 @@ analysis_page <- makePage(
             tokens = list(childrenGap = 10),
             makeCard("Filters", filters, size = 4, style = "max-height: 320px"),
             makeCard("Deals count", plotlyOutput("plot"), size = 8, style = "max-height: 320px")
+            
         ),
         uiOutput("analysis")
     )
 )
 
-
-
-header <- "header"
-navigation <- "navigation"
-footer <- "footer"
-
-layout <- function(mainUI){
-    div(class = "grid-container",
-        div(class = "header", header),
-        div(class = "sidenav", navigation),
-        div(class = "main", mainUI),
-        div(class = "footer", footer)
-    )
-}
-
-
-ui <- fluentPage(
-    layout(analysis_page),
-    tags$head(
-        tags$link(href = "style.css", rel = "stylesheet", type = "text/css")
-    ))
+# UI Structure - Layout ----------------------------------------------------------
 
 header <- tagList(
-    img(src = "appsilon-logo.png", class = "logo"),
+    img(src = "logo.jpg", class = "logo"),
     div(Text(variant = "xLarge", "Sales Reps Analysis"), class = "title"),
     CommandBar(
         items = list(
@@ -74,7 +100,7 @@ header <- tagList(
         ),
         style = list(width = "100%")))
 
-navigation <- Nav(
+navigation <- navigation <- Nav(
     groups = list(
         list(links = list(
             list(name = 'Home', url = '#!/', key = 'home', icon = 'Home'),
@@ -98,11 +124,10 @@ footer <- Stack(
     horizontal = TRUE,
     horizontalAlign = 'space-between',
     tokens = list(childrenGap = 20),
-    Text(variant = "medium", "Built with ❤ by Appsilon", block=TRUE),
+    Text(variant = "medium", "Built with love icon by Appsilon", block=TRUE),
     Text(variant = "medium", nowrap = FALSE, "If you'd like to learn more, reach out to us at hello@appsilon.com"),
     Text(variant = "medium", nowrap = FALSE, "All rights reserved.")
 )
-
 
 layout <- function(mainUI){
     div(class = "grid-container",
@@ -113,10 +138,11 @@ layout <- function(mainUI){
     )
 }
 
-# ---
+# UI 페이지 ----------------------------------------------------------
+
 ui <- fluentPage(
+    tags$style(".card { padding: 28px; margin-bottom: 28px; }"),
     layout(analysis_page),
     tags$head(
-        tags$link(href = "style.css", rel = "stylesheet", type = "text/css")
-    ))
-
+        tags$link(href = "style.css", rel = "stylesheet", type = "text/css"))
+)
