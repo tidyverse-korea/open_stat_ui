@@ -1,17 +1,5 @@
 
-# 카드 제작 함수 ----------------------------------
 
-makeCard <- function(title, content, size = 12, style = "") {
-    div(
-        class = glue::glue("card ms-depth-8 ms-sm{size} ms-xl{size}"),
-        style = style,
-        Stack(
-            tokens = list(childrenGap = 5),
-            Text(variant = "large", title, block = TRUE),
-            content
-        )
-    )
-}
 
 # 제어를 위한 필터 ---------------------------------
 
@@ -56,8 +44,7 @@ ui <- fluentPage(
     Stack(
         tokens = list(childrenGap = 10), horizontal = TRUE,
         makeCard("Filters", filters, size = 4, style = "max-height: 320px"),
-        makeCard("Deals count", plotlyOutput("plot"), size = 8, style = "max-height: 320px"),
-        makeCard("Map", leafletOutput("map"), size = 8, style = "max-height: 320px")
+        makeCard("Deals count", plotlyOutput("plot"), size = 8, style = "max-height: 320px")
     ),
     uiOutput("analysis")
 )

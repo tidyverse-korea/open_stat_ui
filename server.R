@@ -32,10 +32,16 @@ server <- function(input, output, session) {
             p("No matching transactions.")
         }
         
+        # Stack(
+        #     tokens = list(childrenGap = 5),
+        #     Text(variant = "large", "Sales deals details", block = TRUE),
+        #     div(style="max-height: 500px; overflow: auto", items_list)
+        # )
+        
         Stack(
-            tokens = list(childrenGap = 5),
-            Text(variant = "large", "Sales deals details", block = TRUE),
-            div(style="max-height: 500px; overflow: auto", items_list)
+            tokens = list(childrenGap = 10), horizontal = TRUE,
+            makeCard("Top results", div(style="max-height: 500px; overflow: auto", items_list)),
+            makeCard("Map", leafletOutput("map"))
         )
     })
     
