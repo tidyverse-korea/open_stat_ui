@@ -36,9 +36,10 @@ server <- function(input, output, session) {
         
         Stack(
             tokens = list(childrenGap = 5),
-                Text(variant = "large", "Sales deals details", block = TRUE),
-                span(class = "card ms-depth-8 ms-sm8 ms-xl8", style="max-height:400px; overflow: auto", items_list),
-                span(class = "card ms-depth-8 ms-sm4 ms-xl4", style="max-height:400px; overflow: auto", leafletOutput("map"))
+            horizontal = TRUE,
+            Text(variant = "large", "Sales deals details", block = TRUE),
+            makeCard("Top results", div(style="max-height: 500px; overflow: auto", items_list)),
+            makeCard("Map", leafletOutput("map"))
         )
     })
     
